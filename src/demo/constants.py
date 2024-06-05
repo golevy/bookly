@@ -1,0 +1,4 @@
+HEADER_ACCEPT = "Accept"
+HEADER_CONTENT_TYPE = "Content-Type"
+HEADER_USER_AGENT = "User-Agent"
+HEADER_HOST = "Host"
