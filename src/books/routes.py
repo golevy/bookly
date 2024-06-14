@@ -1,19 +1,19 @@
 from fastapi import APIRouter, status
 from typing import List
-from src.books.schemas import Book, BookUpdateRequest
+from src.books.schemas import BookModel, BookUpdateModel
 from src.books.book_data import books
 from fastapi.exceptions import HTTPException
 
 book_router = APIRouter()
 
 
-@book_router.get("/", response_model=List[Book], status_code=status.HTTP_200_OK)
+@book_router.get("/", response_model=List[BookModel], status_code=status.HTTP_200_OK)
 async def find_all():
     return books
 
 
 @book_router.post("/", status_code=status.HTTP_201_CREATED)
-async def create(book_data: Book) -> dict:
+async def create(book_data: BookModel) -> dict:
     new_book = book_data.model_dump()
     books.append(new_book)
 
@@ -30,7 +30,7 @@ async def find_by_id(book_id: int) -> dict:
 
 
 @book_router.patch("/{book_id}")
-async def update_by_id(book_id: int, book_update_data: BookUpdateRequest) -> dict:
+async def update_by_id(book_id: int, book_update_data: BookUpdateModel) -> dict:
     for book in books:
         if book["id"] == book_id:
             book["title"] = book_update_data.title
