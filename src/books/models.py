@@ -1,31 +1,42 @@
 from sqlmodel import SQLModel, Field, Column
 import sqlalchemy.dialects.postgresql as pg
-from datetime import datetime, date
-import uuid
+from datetime import datetime, date, timezone
+from cuid import cuid
 
 
 class Book(SQLModel, table=True):
     __tablename__ = "book"
 
-    id: uuid.UUID = Field(
-        default_factory=uuid.uuid4,
+    id: str = Field(
+        default_factory=cuid,
         sa_column=Column(
-            pg.UUID,
+            pg.VARCHAR,
             nullable=False,
             primary_key=True,
         ),
     )
-    title: str
-    author: str
-    publisher: str
-    published_date: date
-    page_count: int
-    language: str
+    title: str = Field(sa_column=Column(pg.VARCHAR, nullable=False))
+    author: str = Field(sa_column=Column(pg.VARCHAR, nullable=False))
+    publisher: str = Field(sa_column=Column(pg.VARCHAR, nullable=False))
+    published_date: date = Field(sa_column=Column(pg.DATE, nullable=False))
+    page_count: int = Field(sa_column=Column(pg.INTEGER, nullable=False))
+    language: str = Field(sa_column=Column(pg.VARCHAR, nullable=False))
     created_at: datetime = Field(
-        sa_column=Column(pg.TIMESTAMP, nullable=False, default=datetime.now())
+        default_factory=lambda: datetime.now(timezone.utc),
+        sa_column=Column(
+            pg.TIMESTAMP(timezone=True),
+            nullable=False,
+            default=lambda: datetime.now(timezone.utc),
+        ),
     )
     updated_at: datetime = Field(
-        sa_column=Column(pg.TIMESTAMP, nullable=False, default=datetime.now())
+        default_factory=lambda: datetime.now(timezone.utc),
+        sa_column=Column(
+            pg.TIMESTAMP(timezone=True),
+            nullable=False,
+            default=lambda: datetime.now(timezone.utc),
+            onupdate=lambda: datetime.now(timezone.utc),
+        ),
     )
 
     def __repr__(self) -> str:
