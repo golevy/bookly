@@ -22,6 +22,9 @@ class User(SQLModel, table=True):
     is_verified: bool = Field(
         default=False, sa_column=Column(pg.BOOLEAN, nullable=False)
     )
+    password_hash: str = Field(
+        sa_column=Column(pg.VARCHAR, nullable=False), exclude=True
+    )
     created_at: datetime = Field(
         default_factory=lambda: datetime.now(timezone.utc),
         sa_column=Column(
