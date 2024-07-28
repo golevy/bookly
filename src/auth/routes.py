@@ -6,7 +6,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from .service import UserService
 from fastapi.exceptions import HTTPException
 from .schemas import UserModel
-from .utils import create_access_token, decode_token, verify_password
+from .utils import create_access_token, verify_password
 from datetime import timedelta
 
 auth_router = APIRouter()
