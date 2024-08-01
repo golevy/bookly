@@ -30,7 +30,7 @@ class TokenBearer(HTTPBearer):
         return True if token_data is not None else False
 
     def verify_token_data(self, token_data):
-        raise NotImplementedError("Please override this method in child classed")
+        raise NotImplementedError("Please override this method in child classes")
 
 
 class AccessTokenBearer(TokenBearer):
