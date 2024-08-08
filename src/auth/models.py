@@ -19,6 +19,9 @@ class User(SQLModel, table=True):
     email: str = Field(sa_column=Column(pg.VARCHAR, nullable=False))
     first_name: str = Field(sa_column=Column(pg.VARCHAR, nullable=False))
     last_name: str = Field(sa_column=Column(pg.VARCHAR, nullable=False))
+    role: str = Field(
+        sa_column=Column(pg.VARCHAR, nullable=False, server_default="user")
+    )
     is_verified: bool = Field(
         default=False, sa_column=Column(pg.BOOLEAN, nullable=False)
     )
