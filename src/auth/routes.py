@@ -51,6 +51,7 @@ async def login_user(
                 user_data={
                     "id": user.id,
                     "email": user.email,
+                    "role": user.role,
                 }
             )
             refresh_token = create_access_token(
