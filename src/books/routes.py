@@ -22,9 +22,9 @@ role_checker = Depends(RoleChecker(["admin"]))
 )
 async def find_all(
     session: AsyncSession = Depends(get_session),
-    user_details=Depends(access_token_bearer),
+    token_details: dict = Depends(access_token_bearer),
 ):
-    print(user_details)
+    print(token_details)
     books = await book_service.find_all(session)
 
     return books
@@ -39,9 +39,10 @@ async def find_all(
 async def create(
     book_data: BookCreateModel,
     session: AsyncSession = Depends(get_session),
-    user_details=Depends(access_token_bearer),
+    token_details: dict = Depends(access_token_bearer),
 ):
-    new_book = await book_service.create(session, book_data)
+    user_id = token_details.get("user")["user_id"]
+    new_book = await book_service.create(session, book_data, user_id)
     return new_book
 
 
@@ -54,7 +55,7 @@ async def create(
 async def find_one(
     book_id: str,
     session: AsyncSession = Depends(get_session),
-    user_details=Depends(access_token_bearer),
+    token_details: dict = Depends(access_token_bearer),
 ):
     book = await book_service.find_one(session, book_id)
     if book is None:
@@ -74,7 +75,7 @@ async def update(
     book_id: str,
     book_update_data: BookUpdateModel,
     session: AsyncSession = Depends(get_session),
-    user_details=Depends(access_token_bearer),
+    token_details: dict = Depends(access_token_bearer),
 ):
     updated_book = await book_service.update(session, book_id, book_update_data)
     if updated_book is None:
@@ -92,7 +93,7 @@ async def update(
 async def delete(
     book_id: str,
     session: AsyncSession = Depends(get_session),
-    user_details=Depends(access_token_bearer),
+    token_details: dict = Depends(access_token_bearer),
 ):
     book_to_delete = await book_service.delete(session, book_id)
 
