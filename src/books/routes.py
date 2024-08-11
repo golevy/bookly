@@ -24,8 +24,23 @@ async def find_all(
     session: AsyncSession = Depends(get_session),
     token_details: dict = Depends(access_token_bearer),
 ):
-    print(token_details)
     books = await book_service.find_all(session)
+
+    return books
+
+
+@book_router.get(
+    "/user/{user_id}",
+    response_model=List[BookModel],
+    status_code=status.HTTP_200_OK,
+    dependencies=[role_checker],
+)
+async def get_user_book_submissions(
+    user_id: str,
+    session: AsyncSession = Depends(get_session),
+    token_details: dict = Depends(access_token_bearer),
+):
+    books = await book_service.get_user_books(session, user_id)
 
     return books
 
@@ -41,7 +56,7 @@ async def create(
     session: AsyncSession = Depends(get_session),
     token_details: dict = Depends(access_token_bearer),
 ):
-    user_id = token_details.get("user")["user_id"]
+    user_id = token_details.get("user")["id"]
     new_book = await book_service.create(session, book_data, user_id)
     return new_book
 
