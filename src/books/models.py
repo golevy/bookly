@@ -1,5 +1,6 @@
-from sqlmodel import SQLModel, Field, Column
+from sqlmodel import SQLModel, Field, Column, Relationship
 import sqlalchemy.dialects.postgresql as pg
+from src.auth import models
 from datetime import datetime, date, timezone
 from cuid import cuid
 from typing import Optional
@@ -40,6 +41,7 @@ class Book(SQLModel, table=True):
             onupdate=lambda: datetime.now(timezone.utc),
         ),
     )
+    user: Optional["models.User"] = Relationship(back_populates="books")
 
     def __repr__(self) -> str:
         return f"<Book {self.title}>"
