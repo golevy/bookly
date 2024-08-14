@@ -1,6 +1,6 @@
 from sqlmodel.ext.asyncio.session import AsyncSession
 from .schemas import BookCreateModel, BookUpdateModel
-from src.books.models import Book
+from src.db.models import Book
 from sqlmodel import select, desc
 
 
