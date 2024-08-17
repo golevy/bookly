@@ -49,6 +49,9 @@ class User(SQLModel, table=True):
     books: List["Book"] = Relationship(
         back_populates="user", sa_relationship_kwargs={"lazy": "selectin"}
     )
+    reviews: List["Review"] = Relationship(
+        back_populates="user", sa_relationship_kwargs={"lazy": "selectin"}
+    )
 
     def __repr__(self) -> str:
         return f"<User {self.username}>"
@@ -90,6 +93,48 @@ class Book(SQLModel, table=True):
         ),
     )
     user: Optional["User"] = Relationship(back_populates="books")
+    reviews: List["Review"] = Relationship(
+        back_populates="book", sa_relationship_kwargs={"lazy": "selectin"}
+    )
 
     def __repr__(self) -> str:
         return f"<Book {self.title}>"
+
+
+class Review(SQLModel, table=True):
+    __tablename__ = "review"
+
+    id: str = Field(
+        default_factory=cuid,
+        sa_column=Column(
+            pg.VARCHAR,
+            nullable=False,
+            primary_key=True,
+        ),
+    )
+    rating: int = Field(sa_column=Column(pg.INTEGER, nullable=False), lt=5)
+    review_text: str = Field(sa_column=Column(pg.VARCHAR, nullable=False))
+    user_id: Optional[str] = Field(default=None, foreign_key="user.id")
+    book_id: Optional[str] = Field(default=None, foreign_key="book.id")
+    created_at: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc),
+        sa_column=Column(
+            pg.TIMESTAMP(timezone=True),
+            nullable=False,
+            default=lambda: datetime.now(timezone.utc),
+        ),
+    )
+    updated_at: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc),
+        sa_column=Column(
+            pg.TIMESTAMP(timezone=True),
+            nullable=False,
+            default=lambda: datetime.now(timezone.utc),
+            onupdate=lambda: datetime.now(timezone.utc),
+        ),
+    )
+    user: Optional["User"] = Relationship(back_populates="reviews")
+    book: Optional["Book"] = Relationship(back_populates="reviews")
+
+    def __repr__(self) -> str:
+        return f"<Review for book {self.book_id} by user {self.user_id}>"
