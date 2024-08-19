@@ -72,7 +72,7 @@ async def find_one(
     session: AsyncSession = Depends(get_session),
     token_details: dict = Depends(access_token_bearer),
 ):
-    book = await book_service.find_one(session, book_id)
+    book = await book_service.get_book_by_id(session, book_id)
     if book is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Book not found"

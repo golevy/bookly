@@ -19,7 +19,7 @@ class BookService:
 
         return result.all()
 
-    async def find_one(self, session: AsyncSession, book_id: str):
+    async def get_book_by_id(self, session: AsyncSession, book_id: str):
         statement = select(Book).where(Book.id == book_id)
         result = await session.exec(statement)
         book = result.first()
