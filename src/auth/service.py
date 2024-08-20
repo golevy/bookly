@@ -6,7 +6,11 @@ from .utils import generate_password_hash
 
 
 class UserService:
-    async def get_user_by_email(self, email: str, session: AsyncSession):
+    async def get_user_by_email(
+        self,
+        session: AsyncSession,
+        email: str,
+    ):
         statement = select(User).where(User.email == email)
         result = await session.exec(statement)
         user = result.first()
