@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from src.books.routes import book_router
 from src.demo.routes import demo_router
 from src.auth.routes import auth_router
-from src.review.routes import review_router
+from src.reviews.routes import review_router
 from contextlib import asynccontextmanager
 from src.db.main import init_db
 
