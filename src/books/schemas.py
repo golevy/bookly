@@ -1,5 +1,7 @@
 from pydantic import BaseModel
 from datetime import datetime, date
+from typing import List
+from src.reviews.schemas import ReviewModel
 
 
 class BookModel(BaseModel):
@@ -12,6 +14,10 @@ class BookModel(BaseModel):
     language: str
     created_at: datetime
     updated_at: datetime
+
+
+class BookDetailModel(BookModel):
+    reviews: List[ReviewModel]
 
 
 class BookCreateModel(BaseModel):
