@@ -34,6 +34,12 @@ class UserAlreadyExists(BooklyException):
     pass
 
 
+class InvalidCredentials(BooklyException):
+    """User has provided wrong email or password."""
+
+    pass
+
+
 class InsufficientPermissions(BooklyException):
     """User does not have the required permissions to perform the action."""
 

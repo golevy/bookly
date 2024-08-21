@@ -9,8 +9,8 @@ from src.books.schemas import (
 )
 from src.books.service import BookService
 from src.db.main import get_session
-from fastapi.exceptions import HTTPException
 from src.auth.dependencies import AccessTokenBearer, RoleChecker
+from src.errors import BookNotFound
 
 
 book_router = APIRouter()
@@ -79,9 +79,7 @@ async def find_one(
 ):
     book = await book_service.get_book_by_id(session, book_id)
     if book is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Book not found"
-        )
+        raise BookNotFound()
     return book
 
 
@@ -99,9 +97,7 @@ async def update(
 ):
     updated_book = await book_service.update(session, book_id, book_update_data)
     if updated_book is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Book not found"
-        )
+        raise BookNotFound()
     return updated_book
 
 
@@ -118,8 +114,6 @@ async def delete(
     book_to_delete = await book_service.delete(session, book_id)
 
     if book_to_delete is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Book not found"
-        )
+        raise BookNotFound()
 
     return {}
