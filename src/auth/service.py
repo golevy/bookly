@@ -18,7 +18,7 @@ class UserService:
         return user
 
     async def user_exists(self, email, session: AsyncSession):
-        user = await self.get_user_by_email(email, session)
+        user = await self.get_user_by_email(session, email)
 
         return True if user is not None else False
 

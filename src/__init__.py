@@ -1,4 +1,5 @@
 from fastapi import FastAPI, status
+from fastapi.responses import JSONResponse
 from src.books.routes import book_router
 from src.demo.routes import demo_router
 from src.auth.routes import auth_router
@@ -137,6 +138,18 @@ app.add_exception_handler(
         },
     ),
 )
+
+
+@app.exception_handler(500)
+async def internal_server_error_handler(request, exc):
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={
+            "message": "Oops, something went wrong.",
+            "error_code": "internal_server_error",
+        },
+    )
+
 
 app.include_router(book_router, prefix=f"/api/{version}/books", tags=["books"])
 app.include_router(demo_router, prefix=f"/api/{version}/demo", tags=["demo"])
