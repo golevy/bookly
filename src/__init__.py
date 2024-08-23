@@ -7,6 +7,7 @@ from src.reviews.routes import review_router
 from contextlib import asynccontextmanager
 from src.db.main import init_db
 from src.errors import register_all_errors
+from src.middleware import register_middleware
 
 
 @asynccontextmanager
@@ -30,6 +31,8 @@ app = FastAPI(
 )
 
 register_all_errors(app)
+
+register_middleware(app)
 
 
 @app.exception_handler(500)
