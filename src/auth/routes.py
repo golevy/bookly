@@ -10,7 +10,12 @@ from .schemas import (
 )
 from sqlmodel.ext.asyncio.session import AsyncSession
 from .service import UserService
-from .utils import create_access_token, verify_password
+from .utils import (
+    create_access_token,
+    verify_password,
+    create_url_safe_token,
+    decode_url_safe_token,
+)
 from datetime import timedelta, datetime
 from .dependencies import (
     RefreshTokenBearer,
@@ -21,6 +26,7 @@ from .dependencies import (
 from src.db.redis import add_jti_to_blocklist
 from src.errors import UserAlreadyExists, InvalidCredentials, InvalidToken
 from src.mail import mail, create_message
+from src.config import Config
 
 auth_router = APIRouter()
 user_service = UserService()
@@ -40,9 +46,7 @@ async def send_mail(emails: EmailModel):
     return {"message": "Email sent successfully"}
 
 
-@auth_router.post(
-    "/signup", response_model=UserModel, status_code=status.HTTP_201_CREATED
-)
+@auth_router.post("/signup", status_code=status.HTTP_201_CREATED)
 async def create_user_account(
     user_data: UserCreateModel, session: AsyncSession = Depends(get_session)
 ):
@@ -52,7 +56,23 @@ async def create_user_account(
         raise UserAlreadyExists()
     new_user = await user_service.create_user(user_data, session)
 
-    return new_user
+    token = create_url_safe_token({"email": email})
+    link = f"{Config.DOMAIN}/api/v1/auth/verify/{token}"
+    html_message = f"""
+    <h1>Verify your email</h1>
+    <p>Please click on the following link to verify your email address: <a href="{link}"></a></p>
+    """
+
+    message = create_message(
+        recipients=[email], subject="Verify your email", body=html_message
+    )
+
+    await mail.send_message(message)
+
+    return {
+        "message": "User created successfully. Please verify your email address",
+        "user": new_user,
+    }
 
 
 @auth_router.post("/login", response_model=UserModel)
