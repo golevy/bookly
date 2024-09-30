@@ -37,3 +37,7 @@ class UserLoginModel(BaseModel):
 
 class EmailModel(BaseModel):
     addresses: List[str]
+
+
+class PasswordResetModel(BaseModel):
+    email: str = Field(max_length=40)

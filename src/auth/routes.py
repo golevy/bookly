@@ -7,6 +7,7 @@ from .schemas import (
     UserLoginModel,
     UserBooksModel,
     EmailModel,
+    PasswordResetModel,
 )
 from sqlmodel.ext.asyncio.session import AsyncSession
 from .service import UserService
@@ -167,4 +168,29 @@ async def revoke_token(token_details: dict = Depends(AccessTokenBearer())):
 
     return JSONResponse(
         content={"message": "Logged out successfully"}, status_code=status.HTTP_200_OK
+    )
+
+
+@auth_router.post("/reset-password")
+async def forgot_password(email_data: PasswordResetModel):
+    email = email_data.email
+
+    token = create_url_safe_token({"email": email})
+    link = f"{Config.DOMAIN}/api/v1/auth/reset-password/{token}"
+    html_message = f"""
+    <h1>Reset your password</h1>
+    <p>Please click on the following link to reset your password: <a href="{link}"></a></p>
+    """
+
+    message = create_message(
+        recipients=[email], subject="Reset your password", body=html_message
+    )
+
+    await mail.send_message(message)
+
+    return JSONResponse(
+        content={
+            "message": "Please check your email for instructions to reset your password",
+        },
+        status_code=status.HTTP_200_OK,
     )
