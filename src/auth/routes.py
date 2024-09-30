@@ -172,7 +172,7 @@ async def revoke_token(token_details: dict = Depends(AccessTokenBearer())):
 
 
 @auth_router.post("/reset-password")
-async def forgot_password(email_data: PasswordResetModel):
+async def reset_password(email_data: PasswordResetModel):
     email = email_data.email
 
     token = create_url_safe_token({"email": email})
