@@ -41,3 +41,8 @@ class EmailModel(BaseModel):
 
 class PasswordResetModel(BaseModel):
     email: str = Field(max_length=40)
+
+
+class PasswordResetConfirmModel(BaseModel):
+    new_password: str = Field(min_length=6)
+    confirm_new_password: str = Field(min_length=6)
