@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, status, HTTPException
+from fastapi import APIRouter, Depends, status, BackgroundTasks
+from fastapi.exceptions import HTTPException
 from fastapi.responses import JSONResponse
 from src.db.main import get_session
 from .schemas import (
@@ -52,7 +53,9 @@ async def send_mail(emails: EmailModel):
 
 @auth_router.post("/signup", status_code=status.HTTP_201_CREATED)
 async def create_user_account(
-    user_data: UserCreateModel, session: AsyncSession = Depends(get_session)
+    user_data: UserCreateModel,
+    bg_tasks: BackgroundTasks,
+    session: AsyncSession = Depends(get_session),
 ):
     email = user_data.email
     user_exists = await user_service.user_exists(email, session)
@@ -71,7 +74,7 @@ async def create_user_account(
         recipients=[email], subject="Verify your email", body=html_message
     )
 
-    await mail.send_message(message)
+    bg_tasks.add_task(mail.send_message, message)
 
     return {
         "message": "User created successfully. Please verify your email address",
