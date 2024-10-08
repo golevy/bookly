@@ -4,6 +4,7 @@ alembic==1.13.1
 amqp==5.2.0
 annotated-types==0.7.0
 anyio==4.4.0
+asgiref==3.8.1
 async-timeout==4.0.3
 asyncpg==0.29.0
 bcrypt==4.2.0
