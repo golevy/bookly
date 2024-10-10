@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends, status, BackgroundTasks
 from fastapi.exceptions import HTTPException
 from fastapi.responses import JSONResponse
-from src.db.main import get_session
 from .schemas import (
     UserModel,
     UserCreateModel,
@@ -32,6 +31,8 @@ from src.errors import UserAlreadyExists, InvalidCredentials, InvalidToken
 from src.mail import mail, create_message
 from src.config import Config
 from src.errors import UserNotFound
+from src.db.main import get_session
+from src.celery_tasks import send_email
 
 auth_router = APIRouter()
 user_service = UserService()
@@ -40,13 +41,13 @@ role_checker = RoleChecker(["admin"])
 REFRESH_TOKEN_EXPIRY = 30
 
 
-@auth_router.post("send-email")
+@auth_router.post("/send_email")
 async def send_mail(emails: EmailModel):
     emails = emails.addresses
     html = "<h1>Welcome to our app</h1>"
-    message = create_message(recipients=emails, subject="Welcome to our app", body=html)
+    subject = "Welcome to our app"
 
-    await mail.send_message(message)
+    send_email.delay(emails, subject, html)
 
     return {"message": "Email sent successfully"}
 
@@ -65,16 +66,14 @@ async def create_user_account(
 
     token = create_url_safe_token({"email": email})
     link = f"{Config.DOMAIN}/api/v1/auth/verify/{token}"
-    html_message = f"""
+    html = f"""
     <h1>Verify your email</h1>
     <p>Please click on the following link to verify your email address: <a href="{link}"></a></p>
     """
+    emails = [email]
+    subject = "Verify your email"
 
-    message = create_message(
-        recipients=[email], subject="Verify your email", body=html_message
-    )
-
-    bg_tasks.add_task(mail.send_message, message)
+    send_email.delay(emails, subject, html)
 
     return {
         "message": "User created successfully. Please verify your email address",
