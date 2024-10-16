@@ -24,26 +24,36 @@ async def life_span(app: FastAPI):
 
 version = "v1"
 
+description = """
+A REST API for a book review web service.
+
+This REST API is able to:
+- Create, read, update, and delete books.
+- Add reviews to books
+- Add tags to books etc.
+"""
+
+version_prefix = f"/api/{version}"
+
 app = FastAPI(
     title="Bookly",
-    description="A REST API for a book review web service",
+    description=description,
     version=version,
+    license_info={"name": "MIT License", "url": "https://opensource.org/licenses/MIT"},
+    contact={
+        "name": "Levy Lv",
+        "url": "https://github.com/golevy",
+        "email": "golvwei@gmail.com",
+    },
+    terms_of_service="https://github.com/golevy/bookly",
+    openapi_url=f"{version_prefix}/openapi.json",
+    docs_url=f"{version_prefix}/docs",
+    redoc_url=f"{version_prefix}/redoc",
 )
 
 register_all_errors(app)
 
 register_middleware(app)
-
-
-@app.exception_handler(500)
-async def internal_server_error_handler(request, exc):
-    return JSONResponse(
-        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        content={
-            "message": "Oops, something went wrong.",
-            "error_code": "internal_server_error",
-        },
-    )
 
 
 app.include_router(book_router, prefix=f"/api/{version}/books", tags=["books"])
